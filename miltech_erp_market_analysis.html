@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дослідження ринку Miltech ERP Україна 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Neutrals & Military Slate -->
+    <!-- Application Structure Plan: 
+        1. Executive Dashboard: Швидкий огляд лідерів та аутсайдерів за TCO.
+        2. TCO Deep Dive: Інтерактивне порівняння витрат на 5 років з перемикачем масштабування (50 vs 100 користувачів).
+        3. Compliance Matrix: Візуалізація юридичного статусу (заборона 1С/BAS).
+        4. Detailed Competitor Breakdown: Картки з аналізом кожного рішення.
+        5. Strategic Insights: Рекомендації для Miltech-компаній.
+        Ця структура обрана для поступового занурення від фінансових показників до юридичних нюансів та функціональних обмежень.
+    -->
+    <!-- Visualization & Content Choices: 
+        - Bar Chart (Chart.js): Порівняння TCO для 50 користувачів (базовий сценарій).
+        - Scaling Comparison (Chart.js): Візуалізація ефекту "плоскої ціни" Simbioz проти лінійного зростання конкурентів.
+        - Status Badges: Використання кольорового кодування для позначення юридичних ризиків (Заборонено/Дозволено).
+        - Interactive Tabs: Для детального перегляду специфіки MSBC, Creatio та інших.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #fdfcf9; color: #333; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.05); }
+        .tab-active { border-bottom: 2px solid #5a67d8; color: #5a67d8; font-weight: 600; }
+        .legal-banned { background-color: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+        .legal-safe { background-color: #ecfdf5; color: #065f46; border: 1px solid #34d399; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="mb-12 border-b border-stone-200 pb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-stone-800 mb-4">Аналіз IT-рішень для Miltech України (2026)</h1>
+            <p class="text-lg text-stone-600 max-w-3xl leading-relaxed">
+                Дослідження базується на звіті "Simbioz EMS проти конкурентів - TCO 5 років.md". Основна увага приділена сукупній вартості володіння (TCO), можливості масштабування та відповідності українському законодавству щодо заборони російського ПЗ.
+            </p>
+        </header>
+
+        <!-- Section 1: Dashboard -->
+        <section class="mb-16">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="glass-card p-6 rounded-xl shadow-sm border-l-4 border-emerald-500">
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-stone-500 mb-2">Найкращий TCO (5 років)</h3>
+                    <div class="text-2xl font-bold">Simbioz EMS</div>
+                    <p class="text-sm text-stone-600 mt-2">~$120k – $250k (Фіксована ціна)</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl shadow-sm border-l-4 border-amber-500">
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-stone-500 mb-2">Найбільший ризик</h3>
+                    <div class="text-2xl font-bold">1C / BAS</div>
+                    <p class="text-sm text-amber-700 mt-2">Юридично заборонено (Реєстр ДСЗЗІ 2026)</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-stone-500 mb-2">Стандарт Miltech</h3>
+                    <div class="text-2xl font-bold">On-Premise / Local</div>
+                    <p class="text-sm text-stone-600 mt-2">Вимога безпеки для оборонного сектору</p>
+                </div>
+            </div>
+
+            <div class="glass-card p-8 rounded-2xl shadow-md bg-white">
+                <h2 class="text-xl font-bold mb-4 text-stone-800">Порівняння сукупної вартості володіння (50 користувачів)</h2>
+                <p class="text-stone-600 mb-6 italic text-sm">Включає ліцензії, впровадження, підтримку та локалізацію протягом 5 років.</p>
+                <div class="chart-container">
+                    <canvas id="tcoChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Scaling Differentiator -->
+        <section class="mb-16">
+            <div class="bg-stone-800 text-white p-8 rounded-2xl shadow-xl">
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="md:w-1/2">
+                        <h2 class="text-2xl font-bold mb-4">Ефект масштабування: 50 vs 100 користувачів</h2>
+                        <p class="text-stone-300 mb-6 leading-relaxed">
+                            Найсильніший аргумент Simbioz/Odoo Community — відсутність плати за користувача. У той час як витрати Microsoft Dynamics 365 та Creatio подвоюються при зростанні штату, Simbioz зберігає плоску криву витрат.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center border-b border-stone-700 pb-2">
+                                <span>MSBC Premium (Рік)</span>
+                                <span class="font-mono text-amber-400">50: $66k → 100: $132k</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-stone-700 pb-2">
+                                <span>Simbioz EMS (Рік)</span>
+                                <span class="font-mono text-emerald-400">50: Fixed → 100: Fixed</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2 chart-container h-80">
+                        <canvas id="scalingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Legal Compliance -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6 text-stone-800">Юридичний статус та безпека ПЗ</h2>
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-stone-200">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-stone-50">
+                        <tr>
+                            <th class="p-4 border-b font-semibold text-stone-700">Продукт</th>
+                            <th class="p-4 border-b font-semibold text-stone-700">Походження</th>
+                            <th class="p-4 border-b font-semibold text-stone-700">Статус (січень 2026)</th>
+                            <th class="p-4 border-b font-semibold text-stone-700">Ризик Miltech</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="hover:bg-stone-50">
+                            <td class="p-4 border-b font-medium">Simbioz / Odoo</td>
+                            <td class="p-4 border-b">Бельгія / Україна</td>
+                            <td class="p-4 border-b"><span class="px-3 py-1 rounded-full text-xs font-bold legal-safe">ДОЗВОЛЕНО</span></td>
+                            <td class="p-4 border-b text-sm">Мінімальний</td>
+                        </tr>
+                        <tr class="hover:bg-stone-50">
+                            <td class="p-4 border-b font-medium">MS Dynamics 365</td>
+                            <td class="p-4 border-b">США</td>
+                            <td class="p-4 border-b"><span class="px-3 py-1 rounded-full text-xs font-bold legal-safe">ДОЗВОЛЕНО</span></td>
+                            <td class="p-4 border-b text-sm">Хмарна залежність</td>
+                        </tr>
+                        <tr class="hover:bg-stone-50">
+                            <td class="p-4 border-b font-medium">IT-Enterprise</td>
+                            <td class="p-4 border-b">Україна</td>
+                            <td class="p-4 border-b"><span class="px-3 py-1 rounded-full text-xs font-bold legal-safe">ДОЗВОЛЕНО</span></td>
+                            <td class="p-4 border-b text-sm">Мінімальний</td>
+                        </tr>
+                        <tr class="hover:bg-red-50">
+                            <td class="p-4 border-b font-medium">1C / BAS / UA-Budget</td>
+                            <td class="p-4 border-b">РФ (через проксі)</td>
+                            <td class="p-4 border-b"><span class="px-3 py-1 rounded-full text-xs font-bold legal-banned">ЗАБОРОНЕНО</span></td>
+                            <td class="p-4 border-b text-sm text-red-700">Критичний (Постанова №1335)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="mt-4 text-sm text-stone-500 leading-relaxed">
+                *Відповідно до реєстру ДСЗЗІ від 09.01.2026, 27 програмних продуктів російського походження (вкл. 1С, BAS) заборонені для державних підприємств, військових формувань та об'єктів критичної інфраструктури.
+            </p>
+        </section>
+
+        <!-- Section 4: Detailed Competitors Tabs -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6 text-stone-800">Детальний аналіз конкурентів</h2>
+            <div class="flex space-x-4 border-b border-stone-200 mb-6 overflow-x-auto">
+                <button onclick="showTab('msbc')" class="tab-btn pb-2 px-1 text-stone-500 hover:text-stone-800 transition-colors tab-active" id="btn-msbc">MS Dynamics 365</button>
+                <button onclick="showTab('creatio')" class="tab-btn pb-2 px-1 text-stone-500 hover:text-stone-800 transition-colors" id="btn-creatio">Creatio</button>
+                <button onclick="showTab('ite')" class="tab-btn pb-2 px-1 text-stone-500 hover:text-stone-800 transition-colors" id="btn-ite">IT-Enterprise</button>
+                <button onclick="showTab('sap')" class="tab-btn pb-2 px-1 text-stone-500 hover:text-stone-800 transition-colors" id="btn-sap">SAP / Infor</button>
+            </div>
+
+            <div id="tab-msbc" class="tab-content glass-card p-6 rounded-xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-3">MS Dynamics 365 Business Central</h3>
+                        <ul class="space-y-2 text-stone-700 text-sm">
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-2">✓</span> Глобальний стандарт, висока надійність.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">✗</span> Ліцензія Premium: $110/користувач/місяць (з 01.11.2025).
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">✗</span> Обов'язкова локалізація Innoware ($7-$27/користувач).
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-lg">
+                        <div class="text-sm font-semibold text-stone-500 mb-1">Прогноз на 3 роки (50 корис.):</div>
+                        <div class="text-2xl font-bold text-stone-800">> $198,000</div>
+                        <div class="text-xs text-stone-500 mt-1">Тільки ліцензії, без впровадження.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-creatio" class="tab-content hidden glass-card p-6 rounded-xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-3">Creatio</h3>
+                        <ul class="space-y-2 text-stone-700 text-sm">
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-2">✓</span> Потужний BPM та CRM.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">✗</span> Відсутність вбудованого MRP/виробництва.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">✗</span> Необхідність придбання 2-ї ERP для обліку.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-lg">
+                        <div class="text-sm font-semibold text-stone-500 mb-1">Цінова модель:</div>
+                        <div class="text-2xl font-bold text-stone-800">$55 /користувач</div>
+                        <div class="text-xs text-stone-500 mt-1">Enterprise Plan + витрати на інтеграцію ERP.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-ite" class="tab-content hidden glass-card p-6 rounded-xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-3">IT-Enterprise</h3>
+                        <ul class="space-y-2 text-stone-700 text-sm">
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-2">✓</span> 38 років досвіду на ринку України.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-2">✓</span> Повний стек: APS, MES, SCM.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">✗</span> Непрозоре ціноутворення, тривале впровадження.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-lg">
+                        <div class="text-sm font-semibold text-stone-500 mb-1">Термін впровадження:</div>
+                        <div class="text-2xl font-bold text-stone-800">6 – 18 місяців</div>
+                        <div class="text-xs text-stone-500 mt-1">Вимагає значного ресурсу команди.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-sap" class="tab-content hidden glass-card p-6 rounded-xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-3">SAP / Infor CloudSuite</h3>
+                        <ul class="space-y-2 text-stone-700 text-sm">
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-2">✓</span> Глобальна вимога для міжнародної кооперації.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">✗</span> Впровадження: від $500k до $2M.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 mr-2">✗</span> Економічно недоцільно для < 100 користувачів.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-lg">
+                        <div class="text-sm font-semibold text-stone-500 mb-1">Infor A&D Price:</div>
+                        <div class="text-2xl font-bold text-stone-800">$150 - $300</div>
+                        <div class="text-xs text-stone-500 mt-1">На користувача в місяць.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Strategic Recommendations -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6 text-stone-800">Стратегічні рекомендації для Miltech</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="p-6 rounded-2xl bg-emerald-50 border border-emerald-100">
+                    <h4 class="font-bold text-emerald-800 mb-3 flex items-center">
+                        <span class="mr-2">💡</span> Пріоритет TCO
+                    </h4>
+                    <p class="text-sm text-emerald-900 leading-relaxed">
+                        Для компаній, що стрімко зростають, фіксована модель Simbioz EMS є оптимальною. Витрати не зростають лінійно, що дозволяє інвестувати збережені кошти в R&D та виробництво.
+                    </p>
+                </div>
+                <div class="p-6 rounded-2xl bg-amber-50 border border-amber-100">
+                    <h4 class="font-bold text-amber-800 mb-3 flex items-center">
+                        <span class="mr-2">⚠️</span> Юридична чистота
+                    </h4>
+                    <p class="text-sm text-amber-900 leading-relaxed">
+                        Негайна заміна 1С/BAS є обов'язковою для доступу до державних контрактів та міжнародної підтримки. Ігнорування заборони 2026 року — критичний ризик для бізнесу.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center text-stone-400 text-sm py-8 border-t border-stone-100">
+            Дослідження ринку ERP для Miltech • Дані на основі звіту 2026 року
+        </footer>
+    </div>
+
+    <script>
+        // Data for TCO Chart
+        const tcoCtx = document.getElementById('tcoChart').getContext('2d');
+        new Chart(tcoCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Simbioz EMS', 'MSBC Premium', 'Creatio + ERP', 'IT-Enterprise', 'SAP S/4HANA', '1C/BAS (Banned)'],
+                datasets: [{
+                    label: 'TCO (5 років, 50 корис.) у $',
+                    data: [185000, 522000, 425000, 325000, 1400000, 100000],
+                    backgroundColor: [
+                        '#10b981', '#3b82f6', '#8b5cf6', '#6b7280', '#ef4444', '#f87171'
+                    ],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        ticks: { callback: value => '$' + value.toLocaleString() }
+                    }
+                }
+            }
+        });
+
+        // Data for Scaling Chart
+        const scalingCtx = document.getElementById('scalingChart').getContext('2d');
+        new Chart(scalingCtx, {
+            type: 'line',
+            data: {
+                labels: ['50 Користувачів', '100 Користувачів'],
+                datasets: [
+                    {
+                        label: 'MSBC Premium (Рік)',
+                        data: [66000, 132000],
+                        borderColor: '#fbbf24',
+                        backgroundColor: '#fbbf24',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Simbioz EMS (Рік)',
+                        data: [22500, 22500],
+                        borderColor: '#34d399',
+                        backgroundColor: '#34d399',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        labels: { color: '#fff' }
+                    }
+                },
+                scales: {
+                    y: { 
+                        ticks: { color: '#fff' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    },
+                    x: { 
+                        ticks: { color: '#fff' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    }
+                }
+            }
+        });
+
+        // Tab Logic
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active'));
+            
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('tab-active');
+        }
+    </script>
+</body>
+</html>

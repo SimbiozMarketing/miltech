@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MilTech UA: Інтерактивний Аналіз Ринку</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .category-node:hover {
+            transform: translateY(-2px);
+            transition: all 0.2s;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+<nav class="sticky top-0 z-50 bg-white border-b border-slate-200 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-sm">UA</div>
+            <h1 class="text-xl font-bold tracking-tight text-slate-800">MILTECH <span class="text-blue-600">INSIGHTS</span></h1>
+        </div>
+        <div class="hidden md:flex space-x-8 text-sm font-medium">
+            <button onclick="scrollToSection('overview')" class="hover:text-blue-600 transition">Огляд</button>
+            <button onclick="scrollToSection('dynamics')" class="hover:text-blue-600 transition">Динаміка</button>
+            <button onclick="scrollToSection('tech')" class="hover:text-blue-600 transition">Технології</button>
+            <button onclick="scrollToSection('barriers')" class="hover:text-blue-600 transition">Бар'єри</button>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    
+    <!-- Hero / Impact Summary -->
+    <section id="overview" class="mb-12">
+        <div class="bg-blue-900 text-white rounded-3xl p-8 md:p-12 shadow-2xl overflow-hidden relative">
+            <div class="relative z-10">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Ринок MilTech в Україні: Від спротиву до лідерства</h2>
+                <p class="text-blue-100 max-w-2xl mb-8">
+                    Цей розділ демонструє ключові показники зростання екосистеми. Завдяки платформі Brave1 кількість оборонних стартапів зросла в геометричній прогресії, перетворюючи Україну на світовий "live-lab" військових технологій.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                        <p class="text-blue-200 text-sm uppercase tracking-wider mb-1">Зареєстровано в Brave1</p>
+                        <p class="text-4xl font-bold">500+</p>
+                        <p class="text-xs text-blue-300 mt-2">активних розробок</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                        <p class="text-blue-200 text-sm uppercase tracking-wider mb-1">Інвестиційний потенціал</p>
+                        <p class="text-4xl font-bold">$1.5B+</p>
+                        <p class="text-xs text-blue-300 mt-2">прогноз до 2025 року</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                        <p class="text-blue-200 text-sm uppercase tracking-wider mb-1">Ключові напрямки</p>
+                        <p class="text-4xl font-bold">12+</p>
+                        <p class="text-xs text-blue-300 mt-2">технологічних вертикалей</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dynamics & Market Share -->
+    <section id="dynamics" class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div class="glass-card rounded-2xl p-6 flex flex-col">
+            <h3 class="text-xl font-bold mb-2">Розподіл ринку за категоріями</h3>
+            <p class="text-slate-500 text-sm mb-6">Графік показує, які типи технологій домінують у розробках. БПЛА залишаються лідерами, але РЕБ та ШІ показують найшвидші темпи росту.</p>
+            <div class="chart-container mt-auto">
+                <canvas id="marketShareChart"></canvas>
+            </div>
+        </div>
+        <div class="glass-card rounded-2xl p-6 flex flex-col">
+            <h3 class="text-xl font-bold mb-2">Динаміка залучення капіталу</h3>
+            <p class="text-slate-500 text-sm mb-6">Відстеження обсягів фінансування та грантової підтримки. Ми бачимо перехід від волонтерського фінансування до системних венчурних інвестицій.</p>
+            <div class="chart-container mt-auto">
+                <canvas id="fundingTrendChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technologies Interactive Deep Dive -->
+    <section id="tech" class="mb-12">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-bold mb-4">Технологічний ландшафт</h2>
+            <p class="text-slate-600 max-w-3xl mx-auto">
+                Оберіть категорію нижче, щоб детально ознайомитися з поточним станом розробок, ключовими кейсами та рівнем зрілості технологій в Україні.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-4 mb-8" id="tech-filters">
+            <button onclick="updateTechView('all')" data-filter="all" class="px-6 py-2 rounded-full bg-blue-600 text-white shadow-lg tech-btn transition">Всі</button>
+            <button onclick="updateTechView('uav')" data-filter="uav" class="px-6 py-2 rounded-full bg-white text-slate-600 border border-slate-200 hover:border-blue-600 tech-btn transition">БПЛА</button>
+            <button onclick="updateTechView('ew')" data-filter="ew" class="px-6 py-2 rounded-full bg-white text-slate-600 border border-slate-200 hover:border-blue-600 tech-btn transition">РЕБ/РЕР</button>
+            <button onclick="updateTechView('ai')" data-filter="ai" class="px-6 py-2 rounded-full bg-white text-slate-600 border border-slate-200 hover:border-blue-600 tech-btn transition">ШІ та Data</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="tech-cards">
+            <!-- Dynamic Cards -->
+        </div>
+    </section>
+
+    <!-- Radar Maturity Analysis -->
+    <section class="glass-card rounded-3xl p-8 mb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <h3 class="text-2xl font-bold mb-4">Зрілість та готовність рішень</h3>
+                <p class="text-slate-600 mb-6">
+                    Радарна діаграма порівнює різні напрямки за п'ятьма параметрами: Масштабованість, Бойове тестування, Експортний потенціал, Рівень автоматизації та Доступність комплектуючих.
+                </p>
+                <ul class="space-y-4">
+                    <li class="flex items-start">
+                        <span class="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-1">✔</span>
+                        <div>
+                            <span class="font-bold">БПЛА:</span> Найвищий рівень бойового тестування та масштабованості.
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-1">i</span>
+                        <div>
+                            <span class="font-bold">ШІ:</span> Велика перспектива в автоматизації, але залежність від чипів.
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-1">!</span>
+                        <div>
+                            <span class="font-bold">Cyber:</span> Високий рівень технологій, проте низька публічність рішень.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="chart-container">
+                <canvas id="maturityRadarChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Barriers & Future -->
+    <section id="barriers" class="mb-12">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-bold mb-4">Бар'єри та вектори розвитку</h2>
+            <p class="text-slate-600">Що заважає ринку зростати швидше і які пріоритети на 2024-2025 роки?</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="glass-card rounded-2xl p-6">
+                <h4 class="font-bold text-lg mb-4 text-red-600">Основні виклики</h4>
+                <div class="space-y-4">
+                    <div class="p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
+                        <p class="font-bold text-sm">Бюрократія</p>
+                        <p class="text-xs text-slate-600">Тривалий цикл кодифікації та прийняття на озброєння.</p>
+                    </div>
+                    <div class="p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
+                        <p class="font-bold text-sm">Експортні обмеження</p>
+                        <p class="text-xs text-slate-600">Неможливість легально продавати рішення партнерам для масштабування бізнесу.</p>
+                    </div>
+                    <div class="p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
+                        <p class="font-bold text-sm">Доступ до капіталу</p>
+                        <p class="text-xs text-slate-600">Дефіцит "довгих грошей" для R&D складних систем.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 flex flex-col">
+                <h4 class="font-bold text-lg mb-4 text-green-600">Пріоритетність факторів успіху</h4>
+                <div class="chart-container mt-auto">
+                    <canvas id="barriersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="bg-slate-900 rounded-3xl p-10 text-center text-white">
+        <h2 class="text-2xl font-bold mb-4">Готові долучитися до розвитку MilTech?</h2>
+        <p class="text-slate-400 mb-8 max-w-xl mx-auto">Український MilTech — це не тільки про зброю, це про технологічну перевагу, яка рятує життя. Приєднуйтесь до Brave1 або інвестуйте у майбутнє безпеки.</p>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-bold transition transform hover:scale-105">Консультація для інвесторів</button>
+    </section>
+
+</main>
+
+<footer class="mt-20 border-t border-slate-200 py-10 text-center text-slate-500 text-sm">
+    <p>© 2024 MilTech Insight Report. Створено на основі аналітичних даних ринку.</p>
+</footer>
+
+<script>
+    // --- Data Storage ---
+    const techData = [
+        { id: 'uav', category: 'uav', title: 'Ударні та розвідувальні БПЛА', desc: 'Автономні системи, FPV-дрони та крила великого радіусу дії.', status: 'Активне зростання', color: 'blue' },
+        { id: 'ew', category: 'ew', title: 'РЕБ та РЕР', desc: 'Системи радіоелектронної боротьби: від окопних модулів до комплексів захисту об\'єктів.', status: 'Високий попит', color: 'indigo' },
+        { id: 'ai', category: 'ai', title: 'Штучний інтелект', desc: 'Машинний зір для наведення, аналіз супутникових знімків та обробка сигналів.', status: 'R&D фаза', color: 'purple' },
+        { id: 'comms', category: 'all', title: 'Захищений зв\'язок', desc: 'Меш-мережі та криптографічний захист передачі даних у бойових умовах.', status: 'Стабільно', color: 'slate' },
+        { id: 'land', category: 'all', title: 'Наземні роботизовані комплекси', desc: 'Платформи для мінування, розмінування та логістики "останньої милі".', status: 'Масштабування', color: 'orange' },
+        { id: 'delta', category: 'ai', title: 'Ситуаційна обізнаність', desc: 'Інтеграційні платформи (Delta) для синхронізації дій на полі бою.', status: 'Впроваджено', color: 'teal' }
+    ];
+
+    const colorBadgeMap = {
+        blue: 'bg-blue-100 text-blue-700',
+        indigo: 'bg-indigo-100 text-indigo-700',
+        purple: 'bg-purple-100 text-purple-700',
+        slate: 'bg-slate-100 text-slate-700',
+        orange: 'bg-orange-100 text-orange-700',
+        teal: 'bg-teal-100 text-teal-700'
+    };
+
+    // --- Chart Management ---
+    let charts = {};
+
+    function initCharts() {
+        const ctxMarket = document.getElementById('marketShareChart').getContext('2d');
+        charts.market = new Chart(ctxMarket, {
+            type: 'doughnut',
+            data: {
+                labels: ['БПЛА', 'РЕБ/РЕР', 'ШІ/Софт', 'Наземні платформи', 'Інше'],
+                datasets: [{
+                    data: [45, 20, 15, 10, 10],
+                    backgroundColor: ['#2563eb', '#4f46e5', '#9333ea', '#f59e0b', '#64748b'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                }
+            }
+        });
+
+        const ctxFunding = document.getElementById('fundingTrendChart').getContext('2d');
+        charts.funding = new Chart(ctxFunding, {
+            type: 'line',
+            data: {
+                labels: ['Q1 2023', 'Q2 2023', 'Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024'],
+                datasets: [{
+                    label: 'Обсяг інвестицій (M$)',
+                    data: [5, 12, 28, 45, 78, 110],
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        const ctxRadar = document.getElementById('maturityRadarChart').getContext('2d');
+        charts.radar = new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: ['Масштабованість', 'Бойовий досвід', 'Експорт', 'Автономність', 'Залізо'],
+                datasets: [
+                    {
+                        label: 'БПЛА',
+                        data: [90, 100, 85, 70, 75],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                    },
+                    {
+                        label: 'ШІ',
+                        data: [60, 80, 95, 90, 40],
+                        borderColor: '#9333ea',
+                        backgroundColor: 'rgba(147, 51, 234, 0.2)',
+                    }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    r: { angleLines: { display: false }, suggestedMin: 0, suggestedMax: 100 }
+                }
+            }
+        });
+
+        const ctxBarriers = document.getElementById('barriersChart').getContext('2d');
+        charts.barriers = new Chart(ctxBarriers, {
+            type: 'bar',
+            data: {
+                labels: ['Бюрократія', 'Експорт', 'Кадри', 'Фінанси', 'Логістика'],
+                datasets: [{
+                    label: 'Рівень критичності (%)',
+                    data: [85, 92, 65, 78, 45],
+                    backgroundColor: '#ef4444',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                maintainAspectRatio: false,
+                scales: {
+                    x: { max: 100, grid: { display: false } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // --- Interaction Handling ---
+    function updateTechView(filter) {
+        const container = document.getElementById('tech-cards');
+        container.innerHTML = '';
+        
+        const filtered = filter === 'all' ? techData : techData.filter(d => d.category === filter);
+        
+        filtered.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'glass-card rounded-2xl p-6 category-node cursor-pointer';
+            const badgeClass = colorBadgeMap[item.color] || 'bg-blue-100 text-blue-700';
+            card.innerHTML = `
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-bold uppercase px-2 py-1 ${badgeClass} rounded">${item.status}</span>
+                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">→</div>
+                </div>
+                <h4 class="font-bold text-lg mb-2">${item.title}</h4>
+                <p class="text-slate-500 text-sm">${item.desc}</p>
+            `;
+            container.appendChild(card);
+        });
+
+        // Update button styles safely using data-filter attributes
+        document.querySelectorAll('.tech-btn').forEach(btn => {
+            if (btn.getAttribute('data-filter') === filter) {
+                btn.classList.add('bg-blue-600', 'text-white', 'shadow-lg');
+                btn.classList.remove('bg-white', 'text-slate-600');
+            } else {
+                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg');
+                btn.classList.add('bg-white', 'text-slate-600');
+            }
+        });
+    }
+
+    function scrollToSection(id) {
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // --- Init ---
+    window.onload = () => {
+        initCharts();
+        updateTechView('all');
+    };
+</script>
+</body>
+</html>
