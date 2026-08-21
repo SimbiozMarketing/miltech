@@ -1,135 +1,277 @@
-// TODO: підставте URL, куди форма заявки надсилатиме дані
-// (наприклад "https://formsubmit.co/info@simbioz.ua" або власний webhook/CRM endpoint).
-// Поки що поле порожнє — форма показує "успіх", але заявки нікуди не надсилаються.
-const CONTACT_FORM_ENDPOINT = "";
+// ==================== SCENARIO TABS ==================== //
+document.addEventListener('DOMContentLoaded', function() {
+    const scenarioTabs = document.querySelectorAll('.scenario-tab');
+    const scenarioPanes = document.querySelectorAll('.scenario-pane');
 
-const qs = (selector, scope = document) => scope.querySelector(selector);
-const qsa = (selector, scope = document) => [...scope.querySelectorAll(selector)];
+    scenarioTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const scenarioId = this.getAttribute('data-scenario');
 
-const scrollToContact = () => {
-  qs("#contact")?.scrollIntoView({ behavior: "smooth" });
-};
+            // Remove active class from all tabs and panes
+            scenarioTabs.forEach(t => t.classList.remove('active'));
+            scenarioPanes.forEach(p => p.classList.remove('active'));
 
-qsa("[data-scroll-contact]").forEach((button) => {
-  button.addEventListener("click", scrollToContact);
-});
-
-const nav = qs("[data-nav]");
-const menuButton = qs("[data-menu-button]");
-
-const setMenuState = (isOpen) => {
-  nav?.classList.toggle("open", isOpen);
-  if (!menuButton) return;
-  menuButton.setAttribute("aria-label", isOpen ? "Закрити меню" : "Відкрити меню");
-  menuButton.setAttribute("aria-expanded", String(isOpen));
-  menuButton.innerHTML = `<span class="icon">${isOpen ? "×" : "☰"}</span>`;
-};
-
-menuButton?.addEventListener("click", () => {
-  setMenuState(!nav?.classList.contains("open"));
-});
-
-qsa("[data-nav] a").forEach((link) => {
-  link.addEventListener("click", () => setMenuState(false));
-});
-
-const scenarioTabs = qsa("[data-scenario-tab]");
-const scenarioPanels = qsa("[data-scenario-panel]");
-
-scenarioTabs.forEach((tab) => {
-  tab.addEventListener("click", () => {
-    const target = tab.dataset.scenarioTab;
-
-    scenarioTabs.forEach((item) => {
-      const isActive = item === tab;
-      item.classList.toggle("active", isActive);
-      item.setAttribute("aria-selected", String(isActive));
+            // Add active class to clicked tab and corresponding pane
+            this.classList.add('active');
+            const pane = document.getElementById(`scenario-${scenarioId}`);
+            if (pane) {
+                pane.classList.add('active');
+            }
+        });
     });
-
-    scenarioPanels.forEach((panel) => {
-      panel.hidden = panel.dataset.scenarioPanel !== target;
-    });
-  });
 });
 
-qsa("[data-accordion]").forEach((group) => {
-  // Exclude non-accordion articles (e.g. .ai-note) from toggle logic
-  const items = qsa(".accordion", group).filter((item) => qs("button", item));
+// ==================== SMOOTH SCROLLING ==================== //
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href === '#') return;
 
-  items.forEach((item) => {
-    const button = qs("button", item);
-    const content = qs(".accordion-content", item);
-
-    button.addEventListener("click", () => {
-      const isOpen = item.classList.contains("open");
-
-      items.forEach((other) => {
-        other.classList.remove("open");
-        qs("button", other)?.setAttribute("aria-expanded", "false");
-        const otherContent = qs(".accordion-content", other);
-        if (otherContent) otherContent.hidden = true;
-      });
-
-      if (!isOpen) {
-        item.classList.add("open");
-        button.setAttribute("aria-expanded", "true");
-        if (content) content.hidden = false;
-      }
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+            const headerHeight = document.querySelector('.header').offsetHeight;
+            const targetPosition = target.offsetTop - headerHeight;
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+        }
     });
-  });
 });
 
-const contactForm = qs("[data-contact-form]");
-const successState = qs("[data-success-state]");
-const successName = qs("[data-success-name]");
-const resetForm = qs("[data-reset-form]");
-const submitBtn = contactForm ? qs(".form-submit", contactForm) : null;
-
-const showSuccess = (name) => {
-  if (successName) successName.textContent = name ? `, ${name}` : "";
-  if (contactForm) contactForm.hidden = true;
-  if (successState) successState.hidden = false;
-};
-
-contactForm?.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const formData = new FormData(contactForm);
-  const name = String(formData.get("name") || "").trim();
-
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    const btnSpan = qs("span", submitBtn);
-    if (btnSpan) btnSpan.textContent = "Надсилаємо…";
-  }
-
-  try {
-    if (CONTACT_FORM_ENDPOINT) {
-      await fetch(CONTACT_FORM_ENDPOINT, {
-        method: "POST",
-        body: formData,
-        headers: { "Accept": "application/json" },
-      });
+// ==================== STICKY HEADER ==================== //
+window.addEventListener('scroll', function() {
+    const header = document.querySelector('.header');
+    if (window.scrollY > 50) {
+        header.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
     } else {
-      console.warn("CONTACT_FORM_ENDPOINT не налаштований — заявка не була надіслана нікуди.");
+        header.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
     }
-  } catch (_) {
-    // Network error — still show success (form data saved client-side)
-  } finally {
-    if (submitBtn) submitBtn.disabled = false;
-    showSuccess(name);
-  }
 });
 
-resetForm?.addEventListener("click", () => {
-  contactForm?.reset();
-  if (successState) successState.hidden = true;
-  if (contactForm) contactForm.hidden = false;
+// ==================== FORM SUBMISSION ==================== //
+const contactForm = document.getElementById('contact-form');
+if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const data = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            message: formData.get('message')
+        };
+
+        // Validate form
+        if (!data.name || !data.email) {
+            alert('Будь ласка, заповніть всі обов\'язкові поля');
+            return;
+        }
+
+        // Validate email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(data.email)) {
+            alert('Будь ласка, введіть коректний e-mail');
+            return;
+        }
+
+        // Send form (placeholder - replace with actual API)
+        console.log('Form submitted:', data);
+
+        // Show success message
+        alert('Спасибі! Ми зв\'яжемося з вами в найближчі 24 години.');
+        this.reset();
+    });
+}
+
+// ==================== CTA BUTTONS ==================== //
+const ctaButtons = document.querySelectorAll('.btn--primary');
+ctaButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        // Scroll to contact form
+        const contactSection = document.getElementById('cta');
+        if (contactSection) {
+            const headerHeight = document.querySelector('.header').offsetHeight;
+            const targetPosition = contactSection.offsetTop - headerHeight;
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+        }
+    });
 });
 
-// Close mobile nav when clicking outside
-document.addEventListener("click", (e) => {
-  if (!nav || !menuButton) return;
-  if (nav.classList.contains("open") && !nav.contains(e.target) && !menuButton.contains(e.target)) {
-    setMenuState(false);
-  }
+// ==================== MOBILE MENU TOGGLE ==================== //
+function initMobileMenu() {
+    const nav = document.querySelector('.nav');
+    const navList = document.querySelector('.nav__list');
+
+    if (!nav) return;
+
+    // Check if we need mobile menu
+    if (window.innerWidth <= 768) {
+        if (!document.querySelector('.mobile-menu-toggle')) {
+            const toggle = document.createElement('button');
+            toggle.className = 'mobile-menu-toggle';
+            toggle.innerHTML = '☰';
+            toggle.addEventListener('click', function() {
+                navList.classList.toggle('active');
+                toggle.classList.toggle('active');
+            });
+            nav.parentElement.insertBefore(toggle, nav.nextSibling);
+        }
+    }
+}
+
+window.addEventListener('resize', initMobileMenu);
+initMobileMenu();
+
+// ==================== LAZY LOADING ==================== //
+if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    const elements = document.querySelectorAll('.problem-card, .feature-card, .pricing-card, .impl-step');
+    elements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
+        observer.observe(el);
+    });
+}
+
+// ==================== ACTIVE NAVIGATION LINK ==================== //
+window.addEventListener('scroll', function() {
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav__link');
+
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop - 100;
+        if (window.scrollY >= sectionTop) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        const href = link.getAttribute('href');
+        if (href === `#${current}`) {
+            link.classList.add('active');
+        }
+    });
 });
+
+// ==================== COMPARISON TABLE RESPONSIVE ==================== //
+function makeComparisonTableResponsive() {
+    const table = document.querySelector('.comparison-table table');
+    if (!table || window.innerWidth > 768) return;
+
+    const rows = table.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const headers = table.querySelectorAll('th');
+
+        cells.forEach((cell, index) => {
+            const headerText = headers[index]?.textContent;
+            if (headerText) {
+                cell.setAttribute('data-label', headerText);
+            }
+        });
+    });
+}
+
+makeComparisonTableResponsive();
+window.addEventListener('resize', makeComparisonTableResponsive);
+
+// ==================== FORM PHONE MASK ==================== //
+const phoneInput = document.querySelector('input[name="phone"]');
+if (phoneInput) {
+    phoneInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        let formattedValue = '';
+
+        if (value.length > 0) {
+            if (value.length <= 2) {
+                formattedValue = value;
+            } else if (value.length <= 5) {
+                formattedValue = value.slice(0, 2) + ' (' + value.slice(2);
+            } else if (value.length <= 7) {
+                formattedValue = value.slice(0, 2) + ' (' + value.slice(2, 5) + ') ' + value.slice(5);
+            } else if (value.length <= 9) {
+                formattedValue = value.slice(0, 2) + ' (' + value.slice(2, 5) + ') ' + value.slice(5, 7) + '-' + value.slice(7);
+            } else {
+                formattedValue = value.slice(0, 2) + ' (' + value.slice(2, 5) + ') ' + value.slice(5, 7) + '-' + value.slice(7, 9) + '-' + value.slice(9, 11);
+            }
+        }
+
+        e.target.value = '+' + formattedValue;
+    });
+}
+
+// ==================== ANALYTICS - PAGE VIEW ==================== //
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'page_view', {
+            page_path: window.location.pathname
+        });
+    }
+});
+
+// ==================== SCROLL DEPTH TRACKING ==================== //
+let maxScroll = 0;
+window.addEventListener('scroll', function() {
+    const scrollPercentage = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+
+    if (scrollPercentage > maxScroll) {
+        maxScroll = scrollPercentage;
+
+        // Track milestones
+        if (maxScroll > 25 && maxScroll <= 30) {
+            console.log('Scroll depth: 25%');
+        } else if (maxScroll > 50 && maxScroll <= 55) {
+            console.log('Scroll depth: 50%');
+        } else if (maxScroll > 75 && maxScroll <= 80) {
+            console.log('Scroll depth: 75%');
+        } else if (maxScroll > 90) {
+            console.log('Scroll depth: 90%');
+        }
+    }
+});
+
+// ==================== CLICK TRACKING FOR CTA ==================== //
+document.querySelectorAll('.btn--primary').forEach(button => {
+    button.addEventListener('click', function() {
+        const buttonText = this.textContent.trim();
+        console.log('CTA clicked:', buttonText);
+    });
+});
+
+// ==================== UTILITY: ADD ACTIVE CLASS TO NAV LINK ==================== //
+function setActiveNavLink() {
+    const navLinks = document.querySelectorAll('.nav__link');
+    const currentPath = window.location.hash;
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+        }
+    });
+}
+
+window.addEventListener('hashchange', setActiveNavLink);
+setActiveNavLink();
+
+console.log('Simbioz EMS Landing Page loaded successfully');
