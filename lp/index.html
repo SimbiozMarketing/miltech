@@ -55,7 +55,7 @@
       </ul>
     </nav>
 
-    <a class="btn btn--primary btn--sm site-header__cta" href="#request">
+    <a class="btn btn--sm site-header__cta" href="#request">
       Запросити діагностичну зустріч
       <svg class="ico" aria-hidden="true"><use href="#i-arrow-right"/></svg>
     </a>
@@ -95,21 +95,7 @@
         </div>
       </div>
 
-      <!--
-        СЛОТ ЗОБРАЖЕННЯ — HERO
-        Потрібно: 1600x1200 (мін. 2560px по ширині для retina), світла або темна тема.
-        Сюжет за копірайтом: «ERP-система для серійного MilTech-виробництва:
-        конструкція, закупівлі, цех і контракт в одному контурі».
-        Замінити весь блок .slot на: <img src="img/hero.png" alt="..." width="1600" height="1200">
-      -->
-      <figure class="hero__visual slot slot--onDark">
-        <svg class="slot__icon" aria-hidden="true"><use href="#i-image"/></svg>
-        <figcaption class="slot__text">
-          <b>Слот зображення: hero</b>
-          Конструкція, закупівлі, цех і контракт в одному контурі.
-          <span>1600×1200, синтетичні дані</span>
-        </figcaption>
-      </figure>
+      <img class="hero__visual" src="img/hero_3.png" alt="ERP-система для серійного MilTech-виробництва: конструкція, закупівлі, цех і контракт в одному контурі" width="1024" height="1024">
     </div>
 
     <div class="proof" aria-label="Досвід компанії">
@@ -420,55 +406,59 @@
 
     <!-- Підблок: ролі -->
     <div class="roles" data-tabs>
-      <h3 class="roles__title">Оберіть свою роль</h3>
+      <div class="roles__main">
+        <h3 class="roles__title">Оберіть свою роль</h3>
 
-      <div class="roles__list" role="tablist" aria-label="Що змінюється для вашої ролі">
-        <button class="chip" role="tab" id="tab-r1" aria-controls="panel-r1" aria-selected="true" tabindex="0">CEO / власник</button>
-        <button class="chip" role="tab" id="tab-r2" aria-controls="panel-r2" aria-selected="false" tabindex="-1">CFO</button>
-        <button class="chip" role="tab" id="tab-r3" aria-controls="panel-r3" aria-selected="false" tabindex="-1">COO</button>
-        <button class="chip" role="tab" id="tab-r4" aria-controls="panel-r4" aria-selected="false" tabindex="-1">Керівник виробництва</button>
-        <button class="chip" role="tab" id="tab-r5" aria-controls="panel-r5" aria-selected="false" tabindex="-1">CTO / CISO</button>
+        <div class="roles__list" role="tablist" aria-label="Що змінюється для вашої ролі">
+          <button class="chip" role="tab" id="tab-r1" aria-controls="panel-r1" aria-selected="true" tabindex="0">CEO / власник</button>
+          <button class="chip" role="tab" id="tab-r2" aria-controls="panel-r2" aria-selected="false" tabindex="-1">CFO</button>
+          <button class="chip" role="tab" id="tab-r3" aria-controls="panel-r3" aria-selected="false" tabindex="-1">COO</button>
+          <button class="chip" role="tab" id="tab-r4" aria-controls="panel-r4" aria-selected="false" tabindex="-1">Керівник виробництва</button>
+          <button class="chip" role="tab" id="tab-r5" aria-controls="panel-r5" aria-selected="false" tabindex="-1">CTO / CISO</button>
+        </div>
+
+        <div class="role-card" role="tabpanel" id="panel-r1" aria-labelledby="tab-r1" tabindex="0">
+          <dl>
+            <div><dt>Бачите</dt><dd>Стан виконання кожного контракту в реальному часі.</dd></div>
+            <div><dt>Ухвалюєте</dt><dd>Рішення про перерозподіл потужностей до того, як строк став критичним.</dd></div>
+            <div><dt>Зникає ризик</dt><dd>Дізнатися про зрив за два тижні до відвантаження.</dd></div>
+          </dl>
+        </div>
+
+        <div class="role-card" role="tabpanel" id="panel-r2" aria-labelledby="tab-r2" tabindex="0" hidden>
+          <dl>
+            <div><dt>Бачите</dt><dd>Фактичну собівартість кожної партії.</dd></div>
+            <div><dt>Ухвалюєте</dt><dd>Рішення про маржинальність контракту до його завершення.</dd></div>
+            <div><dt>Зникає ризик</dt><dd>Виявити збитковість після закриття періоду.</dd></div>
+          </dl>
+        </div>
+
+        <div class="role-card" role="tabpanel" id="panel-r3" aria-labelledby="tab-r3" tabindex="0" hidden>
+          <dl>
+            <div><dt>Бачите</dt><dd>План-факт і вузькі місця по всьому ланцюгу, від закупівель до відвантаження.</dd></div>
+            <div><dt>Ухвалюєте</dt><dd>Рішення на основі даних системи, а не усних домовленостей у чатах.</dd></div>
+            <div><dt>Зникає ризик</dt><dd>Розсинхрон між продажами, закупівлями й цехом.</dd></div>
+          </dl>
+        </div>
+
+        <div class="role-card" role="tabpanel" id="panel-r4" aria-labelledby="tab-r4" tabindex="0" hidden>
+          <dl>
+            <div><dt>Бачите</dt><dd>Актуальну версію специфікації, дозволені аналоги й теплову карту завантаження.</dd></div>
+            <div><dt>Ухвалюєте</dt><dd>Рішення про заміну компонента з фіксацією в системі, а не на розсуд майстра.</dd></div>
+            <div><dt>Зникає ризик</dt><dd>Запустити партію за застарілою редакцією.</dd></div>
+          </dl>
+        </div>
+
+        <div class="role-card" role="tabpanel" id="panel-r5" aria-labelledby="tab-r5" tabindex="0" hidden>
+          <dl>
+            <div><dt>Бачите</dt><dd>Систему у власному контурі, з доступом до вихідного коду для аудиту.</dd></div>
+            <div><dt>Ухвалюєте</dt><dd>Рішення про модель розгортання й розмежування прав: доступ до конструкторської документації окремо від прав на систему.</dd></div>
+            <div><dt>Зникає ризик</dt><dd>Залежність від зовнішньої хмари й неможливість перевірити, що всередині.</dd></div>
+          </dl>
+        </div>
       </div>
 
-      <div class="role-card" role="tabpanel" id="panel-r1" aria-labelledby="tab-r1" tabindex="0">
-        <dl>
-          <div><dt>Бачите</dt><dd>Стан виконання кожного контракту в реальному часі.</dd></div>
-          <div><dt>Ухвалюєте</dt><dd>Рішення про перерозподіл потужностей до того, як строк став критичним.</dd></div>
-          <div><dt>Зникає ризик</dt><dd>Дізнатися про зрив за два тижні до відвантаження.</dd></div>
-        </dl>
-      </div>
-
-      <div class="role-card" role="tabpanel" id="panel-r2" aria-labelledby="tab-r2" tabindex="0" hidden>
-        <dl>
-          <div><dt>Бачите</dt><dd>Фактичну собівартість кожної партії.</dd></div>
-          <div><dt>Ухвалюєте</dt><dd>Рішення про маржинальність контракту до його завершення.</dd></div>
-          <div><dt>Зникає ризик</dt><dd>Виявити збитковість після закриття періоду.</dd></div>
-        </dl>
-      </div>
-
-      <div class="role-card" role="tabpanel" id="panel-r3" aria-labelledby="tab-r3" tabindex="0" hidden>
-        <dl>
-          <div><dt>Бачите</dt><dd>План-факт і вузькі місця по всьому ланцюгу, від закупівель до відвантаження.</dd></div>
-          <div><dt>Ухвалюєте</dt><dd>Рішення на основі даних системи, а не усних домовленостей у чатах.</dd></div>
-          <div><dt>Зникає ризик</dt><dd>Розсинхрон між продажами, закупівлями й цехом.</dd></div>
-        </dl>
-      </div>
-
-      <div class="role-card" role="tabpanel" id="panel-r4" aria-labelledby="tab-r4" tabindex="0" hidden>
-        <dl>
-          <div><dt>Бачите</dt><dd>Актуальну версію специфікації, дозволені аналоги й теплову карту завантаження.</dd></div>
-          <div><dt>Ухвалюєте</dt><dd>Рішення про заміну компонента з фіксацією в системі, а не на розсуд майстра.</dd></div>
-          <div><dt>Зникає ризик</dt><dd>Запустити партію за застарілою редакцією.</dd></div>
-        </dl>
-      </div>
-
-      <div class="role-card" role="tabpanel" id="panel-r5" aria-labelledby="tab-r5" tabindex="0" hidden>
-        <dl>
-          <div><dt>Бачите</dt><dd>Систему у власному контурі, з доступом до вихідного коду для аудиту.</dd></div>
-          <div><dt>Ухвалюєте</dt><dd>Рішення про модель розгортання й розмежування прав: доступ до конструкторської документації окремо від прав на систему.</dd></div>
-          <div><dt>Зникає ризик</dt><dd>Залежність від зовнішньої хмари й неможливість перевірити, що всередині.</dd></div>
-        </dl>
-      </div>
+      <img class="roles__visual" src="img/miltech_m.png" alt="" width="1271" height="941">
     </div>
   </div>
 </section>
